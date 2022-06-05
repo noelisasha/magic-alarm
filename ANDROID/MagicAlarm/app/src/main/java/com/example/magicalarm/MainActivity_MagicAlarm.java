@@ -8,14 +8,17 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.view.View.OnClickListener;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 public class MainActivity_MagicAlarm extends AppCompatActivity {
 
     private Button submitBtn, sensorBtn;
     private RadioGroup songList;
     private RadioButton selectedSong;
+    private TextView bienvenidaUsr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +33,9 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
         submitBtn = (Button) findViewById(R.id.buttonSubmit);
         sensorBtn = (Button) findViewById(R.id.buttonSensores);
         songList = (RadioGroup) findViewById(R.id.dropdownSongs); // obtener RadioGroup
+        bienvenidaUsr = (TextView) findViewById(R.id.textView7);
 
+        bienvenidaUsr.setText("¡Hola, " + nombreUsr + "!");
 
         sensorBtn.setOnClickListener(new OnClickListener() {
             @Override
