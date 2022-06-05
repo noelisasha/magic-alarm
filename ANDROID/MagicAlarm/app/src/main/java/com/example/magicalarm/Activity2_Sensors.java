@@ -1,6 +1,7 @@
 package com.example.magicalarm;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Context;
 import android.os.Bundle;
 
@@ -52,6 +53,9 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE); // Acceder al servicio de sensores
 
         //showSensorOutput();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
 
     /*private void showSensorOutput() {
@@ -155,13 +159,13 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
 
                     lightness.setText(txt);
 
-                    if(event.values[0] <= 0) {
+                    if(event.values[0] <= 500) {
                         System.out.println("No se detecta luz ==> PRENDER LUZ"); /** DEBUG !! **/
-                        lightBulbImg.setColorFilter(Color.parseColor("#FFFFEB3B")); // Si no detectó luz ==> pintar borde de lampara simulando encender luz
+                        lightBulbImg.setColorFilter(Color.parseColor("#000000")); // Si no detectó luz ==> pintar borde de lampara simulando encender luz
                         //lightBulbImg.setBackgroundColor(Color.parseColor("#FFFFEB3B")); // Si no detectó luz ==> pintar fondo de lampara simulando encender luz
                     } else {
                         System.out.println("Se detectó luz ==> APAGAR LUZ"); /** DEBUG !! **/
-                        lightBulbImg.setColorFilter(Color.parseColor("#000000")); // Si detectó luz ==> pintar borde de lampara simulando apagar luz
+                        lightBulbImg.setColorFilter(Color.parseColor("#FFFFEB3B")); // Si detectó luz ==> pintar borde de lampara simulando apagar luz
                     }
 
                     break;
