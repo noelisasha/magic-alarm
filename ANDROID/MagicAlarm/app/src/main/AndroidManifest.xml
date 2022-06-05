@@ -18,6 +18,7 @@
             android:exported="false" />
         <activity
             android:name=".Activity2_Sensors"
+            android:parentActivityName=".MainActivity_MagicAlarm"
             android:exported="false" />
         <activity
             android:name=".MainActivity_MagicAlarm"
