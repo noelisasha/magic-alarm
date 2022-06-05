@@ -23,6 +23,10 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         System.out.println("Estado de la Activity: <<onCreate>>"); /** DEBUG !! **/
 
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+        String nombreUsr = extras.getString("nombreUsr");
+
         submitBtn = (Button) findViewById(R.id.buttonSubmit);
         sensorBtn = (Button) findViewById(R.id.buttonSensores);
         songList = (RadioGroup) findViewById(R.id.dropdownSongs); // obtener RadioGroup
