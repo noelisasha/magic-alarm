@@ -42,15 +42,15 @@
 
     <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
+        android:layout_height="482dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="10dp" >
+        android:padding="10dp">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/accelerometer"
@@ -83,8 +83,8 @@
 
         <ImageView
             android:id="@+id/lightBulbimageView"
-            android:layout_width="156dp"
-            android:layout_height="152dp"
+            android:layout_width="match_parent"
+            android:layout_height="251dp"
             android:baselineAlignBottom="false"
             android:clickable="false"
             android:focusableInTouchMode="false"

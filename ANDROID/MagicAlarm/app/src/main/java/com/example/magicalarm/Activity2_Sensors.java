@@ -105,7 +105,7 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
                 case Sensor.TYPE_LIGHT :
                     txt += "--- Análisis del Sensor de Luminosidad ---\n";
                     txt += "\n";
-                    txt += "Función: Al tapar el sensor de luz del celuar, se iluminara la lamparita de la imagen que esta abajo.\n";
+                    txt += "Función: Al tapar el sensor de luz del celular, se iluminará la lamparita de la imagen que esta abajo.\n";
                     txt += "\n";
                     txt += "Medición del Sensor de luz:\n";
                     txt += "\n";
