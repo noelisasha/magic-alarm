@@ -102,9 +102,6 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
 
             switch(event.sensor.getType()) {
 
-                switch(event.sensor.getType()) {
-
-
                 case Sensor.TYPE_LIGHT :
                     txt += "--- Análisis del Sensor de Luminosidad ---\n";
                     txt += "\n";
@@ -112,7 +109,7 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
                     txt += "\n";
                     txt += "Medición del Sensor de luz:\n";
                     txt += "\n";
-                    txt += event.values[0] ;
+                    txt += event.values[0];
 
                     lightness.setText(txt);
 
