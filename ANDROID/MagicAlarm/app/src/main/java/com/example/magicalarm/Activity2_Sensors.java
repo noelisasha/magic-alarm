@@ -102,60 +102,17 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
 
             switch(event.sensor.getType()) {
 
-                case Sensor.TYPE_ACCELEROMETER :
-                    txt += "--- Acelerometro ---\n";
-                    txt += "Coord. x = " + float2.format(event.values[0]) + " m/seg2 \n";
-                    txt += "Coord. y = " + float2.format(event.values[1]) + " m/seg2 \n";
-                    txt += "Coord. z = " + float2.format(event.values[2]) + " m/seg2 \n";
-                    if ((event.values[0] > 25) || (event.values[1] > 25) || (event.values[2] > 25)) {
-                        txt += "Vibracion Detectada \n";
-                    }
+                switch(event.sensor.getType()) {
 
-                    accelerometer.setText(txt);
-
-                    break;
-
-                case Sensor.TYPE_GYROSCOPE:
-                    txt += "--- Giroscopo ---\n";
-                    txt += "Coord. x = " + float2.format(event.values[0]) + " deg/s \n";
-                    txt += "Coord. y = " + float2.format(event.values[1]) + " deg/s \n";
-                    txt += "Coord. z = " + float2.format(event.values[2]) + " deg/s \n";
-
-                    gyroscope.setText(txt);
-
-                    break;
-
-                case Sensor.TYPE_ROTATION_VECTOR :
-                    txt += "--- Vector de rotacion ---\n";
-                    txt += "Coord. x = " + event.values[0] + "\n";
-                    txt += "Coord. y = " + event.values[1] + "\n";
-                    txt += "Coord. z = " + event.values[2] + "\n";
-
-                    // Creo objeto para saber como está la pantalla
-                    Display display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-                    int rotation = display.getRotation();
-
-                    // El objeto devuelve 3 estados 0, 1 y 3
-                    switch(rotation) {
-                        case 0:
-                            txt += "Posicion = Vertical \n";
-                            break;
-                        case 1:
-                            txt += "Posicion = Horizontal Izq. \n";
-                            break;
-                        case 2:
-                            txt += "Posicion = Horizontal Der \n";
-                            break;
-                    }
-
-                    txt += "Display: " + rotation + "\n";
-                    giro.setText(txt);
-
-                    break;
 
                 case Sensor.TYPE_LIGHT :
-                    txt += "--- Luminosidad ---\n";
-                    txt += event.values[0] + " Luz \n";
+                    txt += "--- Análisis del Sensor de Luminosidad ---\n";
+                    txt += "\n";
+                    txt += "Función: Al tapar el sensor de luz del celuar, se iluminara la lamparita de la imagen que esta abajo.\n";
+                    txt += "\n";
+                    txt += "Medición del Sensor de luz:\n";
+                    txt += "\n";
+                    txt += event.values[0] ;
 
                     lightness.setText(txt);
 
