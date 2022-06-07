@@ -42,6 +42,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
             public void onClick(View v) {
                 System.out.println("Se hizo clic en el button <<SENSOR>>"); /** DEBUG !! **/
                 Intent i = new Intent();
+                //i.putExtra("nombreUsr", nombreUsr);
                 i.setClass(MainActivity_MagicAlarm.this, Activity2_Sensors.class);
                 startActivity(i);
             }

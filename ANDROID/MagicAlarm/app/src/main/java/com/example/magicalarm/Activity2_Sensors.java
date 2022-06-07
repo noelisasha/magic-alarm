@@ -29,10 +29,7 @@ import java.text.DecimalFormat;
 public class Activity2_Sensors extends AppCompatActivity implements SensorEventListener {
 
     private SensorManager sensorManager;
-    private TextView      accelerometer;
-    private TextView      gyroscope;
     private TextView      lightness;
-    private TextView      giro;
     private ImageView     lightBulbImg;
     DecimalFormat float2 = new DecimalFormat("###.###");
 
@@ -41,33 +38,16 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_2);
 
-        // Defino los botones
-
         // Defino los TXT para representar los datos de los sensores
-        accelerometer  = (TextView) findViewById(R.id.accelerometer);
-        gyroscope     = (TextView) findViewById(R.id.gyroscope);
         lightness   = (TextView) findViewById(R.id.lightness);
-        giro          = (TextView) findViewById(R.id.giro);
         lightBulbImg = (ImageView) findViewById(R.id.lightBulbimageView);
-
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE); // Acceder al servicio de sensores
-
-        //showSensorOutput();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
     }
 
-    /*private void showSensorOutput() {
-        Intent iCommunicate = new Intent();
-        iCommunicate.setClass(Activity2_Sensors.this, SensorListActivity.class);
-
-        startActivity(iCommunicate);
-    }*/
-
     protected void initializeSensors() { // Iniciar el acceso a los sensores
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),   SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),       SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR), SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT),           SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY),         SensorManager.SENSOR_DELAY_NORMAL);
@@ -75,9 +55,6 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
 
 
     private void stopSensorListening() { // Finalizar escucha de sensores
-
-        sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
-        sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE));
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR));
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY));
@@ -116,7 +93,6 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
                     if(event.values[0] <= 500) {
                         System.out.println("No se detecta luz ==> PRENDER LUZ"); /** DEBUG !! **/
                         lightBulbImg.setColorFilter(Color.parseColor("#000000")); // Si no detectó luz ==> pintar borde de lampara simulando encender luz
-                        //lightBulbImg.setBackgroundColor(Color.parseColor("#FFFFEB3B")); // Si no detectó luz ==> pintar fondo de lampara simulando encender luz
                     } else {
                         System.out.println("Se detectó luz ==> APAGAR LUZ"); /** DEBUG !! **/
                         lightBulbImg.setColorFilter(Color.parseColor("#FFFFEB3B")); // Si detectó luz ==> pintar borde de lampara simulando apagar luz
