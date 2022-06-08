@@ -1,9 +1,11 @@
 /***** ALARM - Codigo con estados - Grupo 4 ****/
 
 ///////////////////////////////////////////////////////////////////////////////
-/*** Importar Bibliotecas ***/
-#include <SoftwareSerial.h>
 
+#include <SoftwareSerial.h>
+#include <String.h>
+
+SoftwareSerial miBT(5,6);
 
 /*** Constantes - Pines ***/
 #define PIN_RELAY                          13
@@ -11,8 +13,6 @@
 #define PIN_SENSOR_BUTTON                  2
 #define PIN_ACTUATOR_BUZZER                8
 #define PIN_ACTUATOR_LAMP                  3
-#define PIN_BLUETOOTH_RX                   10
-#define PIN_BLUETOOTH_TX                   11
 
 /*** Constantes - Melodia  ***/
 #define NOTE_B0  31
@@ -105,7 +105,7 @@
 #define NOTE_D8  4699
 #define NOTE_DS8 4978
 #define REST     0
-#define SERIAL   9600
+#define SERIAL_BAUDIOS 9600
 
 /*** Constantes -  States ***/
 // States del SE
@@ -128,6 +128,9 @@
 #define EVT_TURN_OFF_LAMP                   1200
 #define EVT_TURN_ON_LAMP                    1300
 #define EVT_PLAY_MUSIC                      1400
+#define EVT_BLUETOOTH_START_ALARM_LIGHTING 2400
+#define EVT_BLUETOOTH_START_ALARM   2500
+
 
 
 /*** Constantes -  Otras ***/
@@ -148,6 +151,9 @@
 #define INDEX                           -1
 #define DUR_NOTA                        1.1
 #define DUR_NOTA2                       1.8
+#define BLUETOOTH_GET_LIGHT_SENSOR_READING 'L'
+#define BLUETOOTH_PLAY_MUSIC 'M'
+#define BLUETOOTH_START_SEQUENCE 'S'
 
 /*** DEBUG - Puerto Serial ***/
 #define SERIAL_DEBUG_ENABLED 0
@@ -176,7 +182,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 /*** Variables Globales ***/
-SoftwareSerial BTserial(PIN_BLUETOOTH_RX, PIN_BLUETOOTH_TX); 
 int current_state;
 bool timeout;
 int sequencialLightTimesLength;
@@ -186,9 +191,9 @@ bool isLightOn;
 bool outputTone=false;
 unsigned long pauseBetweenNotes;
 unsigned long currentMillis2, previous_time2;
-bool verify_light_sensor, verify_bluetooth_module;
+bool verify_light_sensor;
 bool execute_light_sequence;
-string string_input_bluetooth = "";
+
 
 struct stEvent
 {
@@ -316,7 +321,6 @@ void playNote() {
 
             if ((currentMillis2 - previous_time2) >= pauseBetweenNotes) {
                 previous_time2 = currentMillis2;
-                Serial.println(melody[thisNote]);
                 if (melody[thisNote] == CERO) {
                     emitSound(false);
                 } else {
@@ -346,9 +350,9 @@ void finishSequence() {
 
     turnOnRelay(); //Prendemos la lampara para que quede encendida para el próximo estado
     isLightOn = true;
+    delay(100);
 
     execute_light_sequence = false;
-
     current_state = ST_ALARM_LIGHTING_MUSIC; 
     event.type = EVT_PLAY_MUSIC;
 }
@@ -373,7 +377,6 @@ bool verifyLightSensorState( ) {
     
 
     int current_value_reading = lightSensor.current_value;
-    Serial.println(current_value_reading);
     int last_value_reading = lightSensor.past_value;
 
     if(  (current_value_reading > MAX_LIGHT_THRESHOLD) && (current_value_reading != last_value_reading) )  {
@@ -388,33 +391,13 @@ bool verifyLightSensorState( ) {
 
     return false;
 }
-
-bool verifyBluetoothCom() {
-   //Si se reciben datos desde el módulo de Bluetooth HC05 
-    if (BTserial.available()) { 
-        //Se leen y muestra, a traves del el monitor serie, los datos recibidos. 
-        string_input_bluetooth = BTserial.read();
-        Serial.write(string_input_bluetooth);
-        return true;
-     }
-
-     return false;
+int getLightSensorValue( ) {
+    return readLightSensor( );
 }
 
-bool setBluetoothScreen() {
-    /**
-    //Si se ingresan datos por teclado en el monitor serie  <====================
-    if (Serial.available()) {
-        //se los lee y se los envia al HC05
-        string_input_bluetooth =  Serial.read();
-        Serial.write(c);
-        BTserial.write(c); 
-    }
-    **/
-}
 
 void turnActuatorsOff() {
-    if(event.type == EVT_PLAY_MUSIC) {
+    if(event.type == EVT_PLAY_MUSIC){
         turnOffRelay(); 
         turnOffBuzzer();        
         event.type = EVT_BUTTON_PRESSED;
@@ -423,11 +406,24 @@ void turnActuatorsOff() {
 
 ///////////////////////////////////////////////////////////////////////////////
 void getEvents() {
-    if(verifyBluetoothCom()) {
-        
-        return;
-    }
-    if(verify_light_sensor){
+
+    if (miBT.available()){
+      char charReceived = miBT.read();
+      if(charReceived == BLUETOOTH_GET_LIGHT_SENSOR_READING){
+        char string[1];
+        sprintf(string,"%d\n", getLightSensorValue());
+        miBT.write(string);  
+      } else if(charReceived == BLUETOOTH_PLAY_MUSIC){
+            event.type = EVT_PLAY_MUSIC;  
+        }
+        else if(charReceived == BLUETOOTH_START_SEQUENCE){
+            event.type = EVT_BLUETOOTH_START_ALARM_LIGHTING;  
+            verify_light_sensor = false;
+            execute_light_sequence = true;
+            return;    
+        }
+      
+    } else if(verify_light_sensor){
 
         // Verificar Temporizador && Timeout
         current_time = millis(); // Tomar el tiempo actual.
@@ -449,7 +445,6 @@ void getEvents() {
         }        
         
     } else if(execute_light_sequence) {
-        Serial.println("entro");
         current_time = millis(); // Tomar el tiempo actual.
 
         int  difference = (current_time - previous_time);
@@ -488,15 +483,15 @@ void getEvents() {
 void initiate() {
 
     /** Declarar pines de Entrada y/o Salida **/
-    Serial.begin(SERIAL);
-    BTserial.begin(9600);  //Configurar la velocidad de transferencia de datos entre el Bluethoot HC05 y Android.
-
+    Serial.begin(SERIAL_BAUDIOS);
 
     pinMode(PIN_RELAY, OUTPUT); //Relay (activa loop prender luz)
     pinMode(PIN_SENSOR_LIGHT, INPUT);
     pinMode(PIN_SENSOR_BUTTON, INPUT);
     pinMode(PIN_ACTUATOR_BUZZER, OUTPUT);
     pinMode(PIN_ACTUATOR_LAMP, OUTPUT);
+
+    miBT.begin(SERIAL_BAUDIOS);
 
     /** Inicializaciones **/
     // Inicializar el Estado inicial
@@ -522,6 +517,9 @@ void initiate() {
     currentMillis2 = millis(); // Toma la primera medición del tiempo.
     previous_time2 = millis(); // Toma la primera medición del tiempo.
 
+
+
+
     attachInterrupt(digitalPinToInterrupt(PIN_SENSOR_BUTTON), turnActuatorsOff, RISING); 
 
 }
@@ -537,6 +535,7 @@ void alarm_state_machine() {
                 switch(event.type) {
 
                     case EVT_LIGHT_DETECTED:
+                    case EVT_BLUETOOTH_START_ALARM_LIGHTING:
                         {
                             DebugOutput("ST_ALARM_IDLE", "EVT_LIGHT_DETECTED");             /** DEBUG! **/
                             current_state = ST_ALARM_LIGHTING;              
@@ -547,6 +546,13 @@ void alarm_state_machine() {
                         {
                             DebugOutput("ST_ALARM_IDLE", "EVT_CONTINUE");                   /** DEBUG! **/                            
                             current_state = ST_ALARM_IDLE;
+                        }
+                    break;
+
+                    case EVT_PLAY_MUSIC:
+                        {
+                            DebugOutput("ST_ALARM_IDLE", "EVT_BLUETOOTH_START_ALARM");                   /** DEBUG! **/                            
+                            current_state = ST_ALARM_LIGHTING_MUSIC;
                         }
                     break;
                 
@@ -564,6 +570,7 @@ void alarm_state_machine() {
             {
                 switch(event.type) {
                     case EVT_LIGHT_DETECTED:
+                    case EVT_BLUETOOTH_START_ALARM_LIGHTING:
                         {
                             DebugOutput("ST_ALARM_LIGHTING", "EVT_LIGHT_DETECTED");       /** DEBUG! **/
                             initiateSequence();
@@ -582,7 +589,6 @@ void alarm_state_machine() {
                         {
                             DebugOutput("ST_ALARM_LIGHTING", "EVT_FINISH_SEQUENCE");       /** DEBUG! **/
                             finishSequence();
-                       
                         }
                     break;  
 
