@@ -44,6 +44,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                 Intent i = new Intent();
                 //i.putExtra("nombreUsr", nombreUsr);
                 i.setClass(MainActivity_MagicAlarm.this, Activity2_Sensors.class);
+                finish();
                 startActivity(i);
             }
         });
