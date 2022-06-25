@@ -186,8 +186,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                         perStr += "\n" + per;
                     }
                     // permissions list of don't granted permission
-                    Toast.makeText(this, "ATENCION: La aplicacion no funcionara " +
-                            "correctamente debido a la falta de Permisos", Toast.LENGTH_LONG).show();
+                    showToast("ATENCION: La aplicacion no funcionara correctamente debido a la falta de Permisos");
                 }
                 return;
             }
@@ -248,6 +247,10 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
 
     /**************************************************************************************************/
 
+    private void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -294,13 +297,14 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                 switch(selectedId) { // Verificar qué radio button se activó
                     case R.id.song_HarryPotter:
                         System.out.println("Se hizo clic en la cancion <<song_HarryPotter>>"); /** DEBUG !! **/
-                        i.putExtra("chosenSong", "L");
+                        i.putExtra("chosenSong", "H");
                         break;
                     case R.id.song_2:
                         System.out.println("Se hizo clic en la cancion <<song_2>>"); /** DEBUG !! **/
                         i.putExtra("chosenSong", "T");
                         break;
                     default:
+                        showToast("AHHH");
                         System.out.println("ERROR! Se debe seleccionar una cancion. Vuelve a Harry Potter"); /** DEBUG !! **/
                         i.putExtra("chosenSong", "H");
                         break;
