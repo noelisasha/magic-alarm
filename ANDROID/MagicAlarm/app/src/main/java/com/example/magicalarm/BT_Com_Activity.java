@@ -49,15 +49,15 @@ public class BT_Com_Activity extends AppCompatActivity {
         //obtengo el adaptador del bluethoot
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        //defino el Handler de comunicacion entre el hilo Principal  el secundario.
-        //El hilo secundario va a mostrar informacion al layout atraves utilizando indeirectamente a este handler
+        /* Definir el Handler de comunicacion entre el hilo Principal  el secundario.
+        El hilo secundario va a mostrar informacion al layout atraves utilizando indeirectamente a este handler*/
         bluetoothIn = Handler_Msg_Hilo_Principal();
 
     }
 
     @Override
-    //Cada vez que se detecta el evento OnResume se establece la comunicacion con el HC05, creando un
-    //socketBluethoot
+    /*Cada vez que se detecta el evento OnResume, se establece la comunicacion con el HC05,
+    creando un socketBluethoot*/
     public void onResume() {
         super.onResume();
 
@@ -74,6 +74,7 @@ public class BT_Com_Activity extends AppCompatActivity {
             btSocket = createBluetoothSocket(device);
         } catch (IOException e) {
             //showToast( "La creacción del Socket fallo");
+            System.out.println("ERROR! La creacción del Socket fallo."); /** DEBUG !! **/
         }
         // Establish the Bluetooth socket connection.
         try {
@@ -96,8 +97,8 @@ public class BT_Com_Activity extends AppCompatActivity {
             }
         }
 
-        //Una establecida la conexion con el Hc05 se crea el hilo secundario, el cual va a recibir
-        // los datos de Arduino atraves del bluethoot
+        /* Una vez establecida la conexion con el Hc05, crear el hilo secundario,
+        para recibir los datos de Arduino a traves del bluetooth */
         mConnectedThread = new ConnectedThread(btSocket);
         mConnectedThread.start();
 
@@ -197,18 +198,18 @@ public class BT_Com_Activity extends AppCompatActivity {
             mmOutStream = tmpOut;
         }
 
-        //metodo run del hilo, que va a entrar en una espera activa para recibir los msjs del HC05
+        // Método run del hilo, que va a entrar en una espera activa para recibir los msgs del HC05
         public void run()
         {
             byte[] buffer = new byte[256];
             int bytes;
 
-            //el hilo secundario se queda esperando mensajes del HC05
+            // Hilo secundario se queda en espera de mensajes del HC05
             while (true)
             {
                 try
                 {
-                    //se leen los datos del Bluethoot
+                    // Leer los datos del Bluetooth
                     bytes = mmInStream.read(buffer);
                     String readMessage = new String(buffer, 0, bytes);
 
@@ -228,6 +229,7 @@ public class BT_Com_Activity extends AppCompatActivity {
             } catch (IOException e) {
                 //if you cannot write, close the application
                 //showToast("La conexion fallo");
+                System.out.println("ERROR! La conexion falló."); /** DEBUG !! **/
                 finish();
 
             }

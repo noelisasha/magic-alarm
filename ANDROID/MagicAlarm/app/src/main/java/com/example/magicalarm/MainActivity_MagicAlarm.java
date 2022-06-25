@@ -3,7 +3,9 @@ package com.example.magicalarm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 //import android.support.*;
@@ -25,7 +28,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.content.Intent;
 // UI Components
@@ -36,14 +41,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-public class MainActivity_MagicAlarm extends AppCompatActivity{
+public class MainActivity_MagicAlarm extends AppCompatActivity {
 
     private Button submitBtn, sensorBtn;
     private RadioGroup songList;
     private RadioButton selectedSong;
     private TextView bienvenidaUsr;
 
-    private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<BluetoothDevice>();
+    //private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<BluetoothDevice>();
+    private BluetoothDevice mDevice; // Una variable ya que al desear conectar solo con 1 dispositivo dado, no nos interesa tener lista de todos los dispositivos con Bluetooth disponibles.
 
     private BluetoothAdapter mBluetoothAdapter;
 
@@ -52,21 +58,22 @@ public class MainActivity_MagicAlarm extends AppCompatActivity{
     //se crea un array de String con los permisos a solicitar en tiempo de ejecucion
     //Esto se debe realizar a partir de Android 6.0, ya que con verdiones anteriores
     //con solo solicitarlos en el Manifest es suficiente
-    String[] permissions= new String[]{
+    String[] permissions = new String[]{
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE};
+
     /*****conexion de bluetooth*************************************************/
 
-    private void ini_bluetooth(){
+    private void ini_bluetooth() {
 
         //Se crea un adaptador para poder manejar el bluethoot del celular
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-//se definen un broadcastReceiver que captura el broadcast del SO cuando captura los siguientes eventos:
+        //Definir BroadcastReceiver para  capturar el broadcast del SO al capturar los sig. eventos:
         IntentFilter filter = new IntentFilter();
 
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Cambia el estado del Bluethoot (Acrtivado /Desactivado)
@@ -76,31 +83,23 @@ public class MainActivity_MagicAlarm extends AppCompatActivity{
         //se define (registra) el handler que captura los broadcast anterirmente mencionados.
         registerReceiver(mReceiver, filter);
 
-        if (checkPermissions())
-        {
+        if (checkPermissions()) {
             enableComponent();
         }
 
     }
 
-    protected  void enableComponent()
-    {
+    protected void enableComponent() {
         //se determina si existe bluethoot en el celular
-        if (mBluetoothAdapter == null)
-        {
+        if (mBluetoothAdapter == null) {
             //si el celular no soporta bluethoot
             //showUnsupported();
-        }
-        else
-        {
+        } else {
             //se determina si esta activado el bluethoot
-            if (mBluetoothAdapter.isEnabled())
-            {
+            if (mBluetoothAdapter.isEnabled()) {
                 //se informa si esta habilitado
                 //showEnabled();
-            }
-            else
-            {
+            } else {
                 //se informa si esta deshabilitado
                 //showDisabled();
             }
@@ -119,7 +118,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity{
     }
 
     //Metodo que chequea si estan habilitados los permisos
-    private  boolean checkPermissions() {
+    private boolean checkPermissions() {
         int result;
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -128,14 +127,14 @@ public class MainActivity_MagicAlarm extends AppCompatActivity{
             return true;
         }
 
-        for (String p:permissions) {
-            result = ContextCompat.checkSelfPermission(this,p);
+        for (String p : permissions) {
+            result = ContextCompat.checkSelfPermission(this, p);
             if (result != PackageManager.PERMISSION_GRANTED) {
                 listPermissionsNeeded.add(p);
             }
         }
         if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),MULTIPLE_PERMISSIONS );
+            ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MULTIPLE_PERMISSIONS);
             return false;
         }
         return true;
@@ -165,37 +164,34 @@ public class MainActivity_MagicAlarm extends AppCompatActivity{
 
     //Handler que captura los brodacast que emite el SO al ocurrir los eventos del bluethoot
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @SuppressLint("MissingPermission")
         public void onReceive(Context context, Intent intent) {
 
             //Atraves del Intent obtengo el evento de Bluethoot que informo el broadcast del SO
             String action = intent.getAction();
 
             //Si cambio de estado el Bluethoot(Activado/desactivado)
-            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action))
-            {
+            if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 //Obtengo el parametro, aplicando un Bundle, que me indica el estado del Bluethoot
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
 
                 //Si esta activado
-                if (state == BluetoothAdapter.STATE_ON)
-                {
+                if (state == BluetoothAdapter.STATE_ON) {
                     // showToast("Activar");
 
                     //showEnabled();
                 }
             }
             //Si se inicio la busqueda de dispositivos bluethoot
-            else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action))
-            {
+            else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 //Creo la lista donde voy a mostrar los dispositivos encontrados
-                mDeviceList = new ArrayList<BluetoothDevice>();
+                //mDeviceList = new ArrayList<BluetoothDevice>();
 
                 //muestro el cuadro de dialogo de busqueda
                 //mProgressDlg.show();
             }
             //Si finalizo la busqueda de dispositivos bluethoot
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action))
-            {
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 //se cierra el cuadro de dialogo de busqueda
                 //mProgressDlg.dismiss();
 
@@ -208,13 +204,14 @@ public class MainActivity_MagicAlarm extends AppCompatActivity{
                 //startActivity(newIntent);
             }
             //si se encontro un dispositivo bluethoot
-            else if (BluetoothDevice.ACTION_FOUND.equals(action))
-            {
+            else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //Se lo agregan sus datos a una lista de dispositivos encontrados
                 BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                // if (device.getName().equals("HC05-G4"))
-                mDeviceList.add(device);
 
+                if (device.getName().equals("HC05-G4")) {
+                    //mDeviceList.add(device);
+                    mDevice=device;
+                }
 
             }
         }
