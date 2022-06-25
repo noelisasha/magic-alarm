@@ -34,6 +34,9 @@ public class BT_Com_Activity extends AppCompatActivity {
     private BluetoothSocket btSocket = null;
     private StringBuilder recDataString = new StringBuilder();
 
+    private String nombreUsr;
+    private String chosenSong;
+
     private ConnectedThread mConnectedThread;
 
     // SPP UUID service  - Funciona en la mayoria de los dispositivos
@@ -46,6 +49,12 @@ public class BT_Com_Activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+        nombreUsr = extras.getString("nombreUsr");
+        chosenSong = extras.getString("chosenSong");
+        BluetoothDevice mDevice = getIntent().getExtras().getParcelable("arduinoDevice");
+        address = mDevice.getAddress();
         //obtengo el adaptador del bluethoot
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -60,12 +69,6 @@ public class BT_Com_Activity extends AppCompatActivity {
     creando un socketBluethoot*/
     public void onResume() {
         super.onResume();
-
-        //Obtengo el parametro, aplicando un Bundle, que me indica la Mac Adress del HC05
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-
-        address = extras.getString("Direccion_Bluethoot");
 
         BluetoothDevice device = btAdapter.getRemoteDevice(address);
 
@@ -104,7 +107,14 @@ public class BT_Com_Activity extends AppCompatActivity {
 
         //I send a character when resuming.beginning transmission to check device is connected
         //If it is not an exception will be thrown in the write method and finish() will be called
-        mConnectedThread.write("x");
+        mConnectedThread.write(chosenSong);
+
+        Intent i = new Intent();
+        //i.putExtra("msgFromArduino", dataInPrint);
+        i.setClass(BT_Com_Activity.this, MainActivity_MagicAlarm.class);
+        i.putExtra("nombreUsr", nombreUsr);
+        finish();
+        startActivity(i);
     }
 
 
@@ -222,7 +232,7 @@ public class BT_Com_Activity extends AppCompatActivity {
                     // Leer los datos del Bluetooth
                     bytes = mmInStream.read(buffer);
                     String readMessage = new String(buffer, 0, bytes);
-
+                    System.out.println("Se recibió: " + readMessage); /** DEBUG !! **/
                     //se muestran en el layout de la activity, utilizando el handler del hilo
                     // principal antes mencionado
                     bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();

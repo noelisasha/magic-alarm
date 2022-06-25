@@ -55,12 +55,15 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
 
     public static final int MULTIPLE_PERMISSIONS = 10; // code you want.
 
+    private String nombreUsr;
+
     //se crea un array de String con los permisos a solicitar en tiempo de ejecucion
     //Esto se debe realizar a partir de Android 6.0, ya que con verdiones anteriores
     //con solo solicitarlos en el Manifest es suficiente
     String[] permissions = new String[]{
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_PHONE_STATE,
@@ -73,20 +76,46 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
         //Se crea un adaptador para poder manejar el bluethoot del celular
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        //Definir BroadcastReceiver para  capturar el broadcast del SO al capturar los sig. eventos:
-        IntentFilter filter = new IntentFilter();
-
-        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED); //Cambia el estado del Bluethoot (Acrtivado /Desactivado)
-        filter.addAction(BluetoothDevice.ACTION_FOUND); //Se encuentra un dispositivo bluethoot al realizar una busqueda
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED); //Cuando se comienza una busqueda de bluethoot
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED); //cuando la busqueda de bluethoot finaliza
-        //se define (registra) el handler que captura los broadcast anterirmente mencionados.
-        registerReceiver(mReceiver, filter);
-
+        System.out.println("checkiando permisos.... (lineas 87)"); /** DEBUG !! **/
         if (checkPermissions()) {
+            System.out.println("permisos checkiados (lineas 87)"); /** DEBUG !! **/
             enableComponent();
+        } else {
+            System.out.println("permisos fallaron!"); /** DEBUG !! **/
+            //ver despues si incluir este if en onresume
         }
 
+    }
+
+    protected void searchDevices() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            checkPermissions();
+        }
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+        if (pairedDevices == null || pairedDevices.size() == 0)
+        {
+            System.out.println("No devices found"); /** DEBUG !! **/
+        }
+        else
+        {
+            ArrayList<BluetoothDevice> list = new ArrayList<BluetoothDevice>();
+
+            list.addAll(pairedDevices);
+
+            System.out.println("list: " + list); /** DEBUG !! **/
+            for(BluetoothDevice device :list){
+                if (device.getAddress().equals("00:21:09:00:01:B1")) {
+                    System.out.println("Se encontró el arduino!"); /** DEBUG !! **/
+                    mDevice = device;
+
+                    return;
+                }
+
+            }
+            System.out.println("No se encontró el arduino! :("); /** DEBUG !! **/
+        }
     }
 
     protected void enableComponent() {
@@ -98,7 +127,10 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
             //se determina si esta activado el bluethoot
             if (mBluetoothAdapter.isEnabled()) {
                 //se informa si esta habilitado
+                System.out.println("Bluetooth Enabled (lineas 102)"); /** DEBUG !! **/
                 //showEnabled();
+                searchDevices();
+
             } else {
                 //se informa si esta deshabilitado
                 //showDisabled();
@@ -169,7 +201,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
 
             //Atraves del Intent obtengo el evento de Bluethoot que informo el broadcast del SO
             String action = intent.getAction();
-
+            System.out.println("este es el action " + action); /** DEBUG !! **/
             //Si cambio de estado el Bluethoot(Activado/desactivado)
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                 //Obtengo el parametro, aplicando un Bundle, que me indica el estado del Bluethoot
@@ -207,11 +239,8 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
             else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //Se lo agregan sus datos a una lista de dispositivos encontrados
                 BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                System.out.println("bluetooth encontrado!"); /** DEBUG !! **/
 
-                if (device.getName().equals("HC05-G4")) {
-                    //mDeviceList.add(device);
-                    mDevice=device;
-                }
 
             }
         }
@@ -225,15 +254,19 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         System.out.println("Estado de la Activity: <<onCreate>>"); /** DEBUG !! **/
 
-        Intent i = getIntent();
-        Bundle extras = i.getExtras();
-        String nombreUsr = extras.getString("nombreUsr");
+
+
+
+        ini_bluetooth();
 
         submitBtn = (Button) findViewById(R.id.buttonSubmit);
         sensorBtn = (Button) findViewById(R.id.buttonSensores);
         songList = (RadioGroup) findViewById(R.id.dropdownSongs); // obtener RadioGroup
         bienvenidaUsr = (TextView) findViewById(R.id.textView7);
 
+        Intent i = getIntent();
+        Bundle extras = i.getExtras();
+        nombreUsr = extras.getString("nombreUsr");
         bienvenidaUsr.setText("¡Hola, " + nombreUsr + "!");
 
         sensorBtn.setOnClickListener(new OnClickListener() {
@@ -257,23 +290,26 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                 //we are defining the selectId and then we are fetching the id of the checked radio button using the function getCheckedRadioButton()
                 selectedSong = findViewById(selectedId);
 
+                Intent i = new Intent();
                 switch(selectedId) { // Verificar qué radio button se activó
                     case R.id.song_HarryPotter:
                         System.out.println("Se hizo clic en la cancion <<song_HarryPotter>>"); /** DEBUG !! **/
-                        // logica envio comando cancion 1
+                        i.putExtra("chosenSong", "L");
                         break;
                     case R.id.song_2:
                         System.out.println("Se hizo clic en la cancion <<song_2>>"); /** DEBUG !! **/
-                        // logica envio comando cancion 2
-                        break;
-                    case R.id.song_3:
-                        System.out.println("Se hizo clic en la cancion <<song_3>>"); /** DEBUG !! **/
-                        // logica envio comando cancion 3
+                        i.putExtra("chosenSong", "T");
                         break;
                     default:
-                        System.out.println("ERROR! Se debe seleccionar una cancion."); /** DEBUG !! **/
+                        System.out.println("ERROR! Se debe seleccionar una cancion. Vuelve a Harry Potter"); /** DEBUG !! **/
+                        i.putExtra("chosenSong", "H");
                         break;
                 }
+                i.putExtra("arduinoDevice", mDevice);
+                i.putExtra("nombreUsr", nombreUsr);
+                i.setClass(MainActivity_MagicAlarm.this, BT_Com_Activity.class);
+                finish();
+                startActivity(i);
             }
         });
     }

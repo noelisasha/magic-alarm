@@ -91,7 +91,7 @@
                 android:text="Selecciona la canción que más te guste:"
                 android:textSize="20sp" />
 
-            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            <RadioGroup
                 android:id="@+id/dropdownSongs"
                 android:layout_width="154dp"
                 android:layout_height="150dp"
@@ -107,13 +107,8 @@
                     android:id="@+id/song_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Song 2" />
+                    android:text="Tetris" />
 
-                <RadioButton
-                    android:id="@+id/song_3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Song 3" />
             </RadioGroup>
         </LinearLayout>
     </LinearLayout>
