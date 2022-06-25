@@ -155,7 +155,17 @@ public class BT_Com_Activity extends AppCompatActivity {
                     if (endOfLineIndex > 0)
                     {
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);
+
+
+                        /*
+                        Intent i = new Intent();
+                        //i.putExtra("msgFromArduino", dataInPrint);
+                        i.setClass(BT_Com_Activity.this, MainActivity_MagicAlarm.class);
+                        finish();
+                        startActivity(i);
+                        */
                         //txtPotenciometro.setText(dataInPrint);
+                        System.out.println("MSG F+from Arduino: << " + dataInPrint + " >>"); /** DEBUG !! **/
 
                         recDataString.delete(0, recDataString.length());
                     }
