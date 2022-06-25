@@ -3,6 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.magicalarm">
 
+    <!--- Aca se indican los permisos que va a necesitar la aplicacion -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,6 +22,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MagicAlarm"
         tools:targetApi="31">
+        <activity
+            android:name=".BT_Com_Activity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity_NombreUsuario"
             android:exported="true">
@@ -27,13 +39,11 @@
             android:exported="false" />
         <activity
             android:name=".Activity2_Sensors"
-            android:parentActivityName=".MainActivity_MagicAlarm"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity_MagicAlarm" />
         <activity
             android:name=".MainActivity_MagicAlarm"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
     </application>
 
 </manifest>
