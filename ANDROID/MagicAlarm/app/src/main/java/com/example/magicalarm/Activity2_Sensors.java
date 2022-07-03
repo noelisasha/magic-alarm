@@ -90,7 +90,7 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
 
                     lightness.setText(txt);
 
-                    if(event.values[0] <= 500) {
+                    if(event.values[0] <= 200) {
                         System.out.println("No se detecta luz ==> PRENDER LUZ"); /** DEBUG !! **/
                         lightBulbImg.setColorFilter(Color.parseColor("#000000")); // Si no detectó luz ==> pintar borde de lampara simulando encender luz
                     } else {

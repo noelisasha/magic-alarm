@@ -8,11 +8,9 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,8 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 //import android.support.v7.app.CompatActivity;
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,19 +27,14 @@ import android.bluetooth.BluetoothDevice;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.content.Intent;
 // UI Components
-import android.view.View;
-import android.widget.Button;
 import android.view.View.OnClickListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 public class MainActivity_MagicAlarm extends AppCompatActivity {
 
-    private Button submitBtn, sensorBtn;
+    private Button submitBtn, sensorBtn, arduinoLuzBtn, playMusic;
     private RadioGroup songList;
     private RadioButton selectedSong;
     private TextView bienvenidaUsr;
@@ -56,6 +47,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
     public static final int MULTIPLE_PERMISSIONS = 10; // code you want.
 
     private String nombreUsr;
+    private String mensajeAMostrar;
 
     //se crea un array de String con los permisos a solicitar en tiempo de ejecucion
     //Esto se debe realizar a partir de Android 6.0, ya que con verdiones anteriores
@@ -264,13 +256,20 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
 
         submitBtn = (Button) findViewById(R.id.buttonSubmit);
         sensorBtn = (Button) findViewById(R.id.buttonSensores);
+        arduinoLuzBtn = (Button) findViewById(R.id.arduinoLuzSensorBtn);
+        playMusic = (Button) findViewById(R.id.playMusicBtn);
         songList = (RadioGroup) findViewById(R.id.dropdownSongs); // obtener RadioGroup
-        bienvenidaUsr = (TextView) findViewById(R.id.textView7);
+        bienvenidaUsr = (TextView) findViewById(R.id.NombreUsuario);
 
         Intent i = getIntent();
         Bundle extras = i.getExtras();
         nombreUsr = extras.getString("nombreUsr");
         bienvenidaUsr.setText("¡Hola, " + nombreUsr + "!");
+        mensajeAMostrar = extras.getString("mensajeAMostrar");
+
+        if(mensajeAMostrar != null && !mensajeAMostrar.isEmpty()) {
+            showToast(mensajeAMostrar);
+        }
 
         sensorBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -279,6 +278,36 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                 Intent i = new Intent();
                 //i.putExtra("nombreUsr", nombreUsr);
                 i.setClass(MainActivity_MagicAlarm.this, Activity2_Sensors.class);
+                finish();
+                startActivity(i);
+
+            }
+        });
+
+        arduinoLuzBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Se hizo clic en el button <<ARDUINO_LUZ>>"); /** DEBUG !! **/
+                Intent i = new Intent();
+                i.putExtra("LightReading", "L");
+                i.putExtra("arduinoDevice", mDevice);
+                i.putExtra("nombreUsr", nombreUsr);
+                i.setClass(MainActivity_MagicAlarm.this, BT_Com_Activity.class);
+                finish();
+                startActivity(i);
+
+            }
+        });
+
+        playMusic.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Se hizo clic en el button <<PLAY_MUSIC>>");
+                Intent i = new Intent();
+                i.putExtra("PlayMusic", "M");
+                i.putExtra("arduinoDevice", mDevice);
+                i.putExtra("nombreUsr", nombreUsr);
+                i.setClass(MainActivity_MagicAlarm.this, BT_Com_Activity.class);
                 finish();
                 startActivity(i);
 
@@ -304,7 +333,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                         i.putExtra("chosenSong", "T");
                         break;
                     default:
-                        showToast("AHHH");
+                        showToast("Se eligió Harry Potter por defecto");
                         System.out.println("ERROR! Se debe seleccionar una cancion. Vuelve a Harry Potter"); /** DEBUG !! **/
                         i.putExtra("chosenSong", "H");
                         break;

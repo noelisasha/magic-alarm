@@ -36,6 +36,8 @@ public class BT_Com_Activity extends AppCompatActivity {
 
     private String nombreUsr;
     private String chosenSong;
+    private String lightReading;
+    private String playMusic;
 
     private ConnectedThread mConnectedThread;
 
@@ -53,6 +55,9 @@ public class BT_Com_Activity extends AppCompatActivity {
         Bundle extras = i.getExtras();
         nombreUsr = extras.getString("nombreUsr");
         chosenSong = extras.getString("chosenSong");
+        lightReading = extras.getString("LightReading");
+        playMusic = extras.getString("PlayMusic");
+
         BluetoothDevice mDevice = getIntent().getExtras().getParcelable("arduinoDevice");
         address = mDevice.getAddress();
         //obtengo el adaptador del bluethoot
@@ -107,14 +112,20 @@ public class BT_Com_Activity extends AppCompatActivity {
 
         //I send a character when resuming.beginning transmission to check device is connected
         //If it is not an exception will be thrown in the write method and finish() will be called
-        mConnectedThread.write(chosenSong);
+        if(chosenSong != null){
+            mConnectedThread.write(chosenSong);
+        } else if(lightReading != null){
+            mConnectedThread.write(lightReading);
+        } else if (playMusic !=null){
+            mConnectedThread.write(playMusic);
+        }
 
-        Intent i = new Intent();
+        /*Intent i = new Intent();
         //i.putExtra("msgFromArduino", dataInPrint);
         i.setClass(BT_Com_Activity.this, MainActivity_MagicAlarm.class);
         i.putExtra("nombreUsr", nombreUsr);
         finish();
-        startActivity(i);
+        startActivity(i);*/
     }
 
 
@@ -185,17 +196,6 @@ public class BT_Com_Activity extends AppCompatActivity {
 
     }
 
-    /*     //Listener del boton encender que envia  msj para enceder Led a Arduino atraves del Bluethoot
-    private View.OnClickListener btnEncenderListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            mConnectedThread.write("1");    // Send "1" via Bluetooth
-            showToast("Encender el LED");        }
-    };
-*/
-    /*private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-    }*/
     private class ConnectedThread extends Thread
     {
         private final InputStream mmInStream;
@@ -236,6 +236,16 @@ public class BT_Com_Activity extends AppCompatActivity {
                     //se muestran en el layout de la activity, utilizando el handler del hilo
                     // principal antes mencionado
                     bluetoothIn.obtainMessage(handlerState, bytes, -1, readMessage).sendToTarget();
+
+                    if(readMessage != null && !readMessage.isEmpty()) {
+                        Intent i = new Intent();
+                        i.setClass(BT_Com_Activity.this, MainActivity_MagicAlarm.class);
+                        i.putExtra("mensajeAMostrar", readMessage);
+                        i.putExtra("nombreUsr", nombreUsr);
+                        finish();
+                        startActivity(i);
+                    }
+
                 } catch (IOException e) {
                     break;
                 }
