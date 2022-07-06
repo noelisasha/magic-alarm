@@ -81,19 +81,11 @@ public class BT_Com_Activity extends AppCompatActivity {
         try {
             btSocket = createBluetoothSocket(device);
         } catch (IOException e) {
-            //showToast( "La creacción del Socket fallo");
-            System.out.println("ERROR! La creacción del Socket fallo."); /** DEBUG !! **/
+            System.out.println("ERROR! La cracción del Socket fallo."); /** DEBUG !! **/
         }
         // Establish the Bluetooth socket connection.
         try {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return;
             }
             btSocket.connect();
@@ -101,7 +93,7 @@ public class BT_Com_Activity extends AppCompatActivity {
             try {
                 btSocket.close();
             } catch (IOException e2) {
-                //insert code to deal with this
+                //code to deal with this
             }
         }
 
@@ -120,12 +112,6 @@ public class BT_Com_Activity extends AppCompatActivity {
             mConnectedThread.write(playMusic);
         }
 
-        /*Intent i = new Intent();
-        //i.putExtra("msgFromArduino", dataInPrint);
-        i.setClass(BT_Com_Activity.this, MainActivity_MagicAlarm.class);
-        i.putExtra("nombreUsr", nombreUsr);
-        finish();
-        startActivity(i);*/
     }
 
 
@@ -137,7 +123,7 @@ public class BT_Com_Activity extends AppCompatActivity {
             //Don't leave Bluetooth sockets open when leaving activity
             btSocket.close();
         } catch (IOException e2) {
-            //insert code to deal with this
+            //code to deal  with this
         }
     }
 
@@ -147,11 +133,6 @@ public class BT_Com_Activity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return null ;
         }
         return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
@@ -176,16 +157,6 @@ public class BT_Com_Activity extends AppCompatActivity {
                     if (endOfLineIndex > 0)
                     {
                         String dataInPrint = recDataString.substring(0, endOfLineIndex);
-
-
-                        /*
-                        Intent i = new Intent();
-                        //i.putExtra("msgFromArduino", dataInPrint);
-                        i.setClass(BT_Com_Activity.this, MainActivity_MagicAlarm.class);
-                        finish();
-                        startActivity(i);
-                        */
-                        //txtPotenciometro.setText(dataInPrint);
                         System.out.println("MSG F+from Arduino: << " + dataInPrint + " >>"); /** DEBUG !! **/
 
                         recDataString.delete(0, recDataString.length());
@@ -258,7 +229,6 @@ public class BT_Com_Activity extends AppCompatActivity {
                 mmOutStream.write(msgBuffer);                //write bytes over BT connection via outstream
             } catch (IOException e) {
                 //if you cannot write, close the application
-                //showToast("La conexion fallo");
                 System.out.println("ERROR! La conexion falló."); /** DEBUG !! **/
                 finish();
 

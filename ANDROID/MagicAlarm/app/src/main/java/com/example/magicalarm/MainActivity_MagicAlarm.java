@@ -39,7 +39,6 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
     private RadioButton selectedSong;
     private TextView bienvenidaUsr;
 
-    //private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<BluetoothDevice>();
     private BluetoothDevice mDevice; // Una variable ya que al desear conectar solo con 1 dispositivo dado, no nos interesa tener lista de todos los dispositivos con Bluetooth disponibles.
 
     private BluetoothAdapter mBluetoothAdapter;
@@ -49,9 +48,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
     private String nombreUsr;
     private String mensajeAMostrar;
 
-    //se crea un array de String con los permisos a solicitar en tiempo de ejecucion
-    //Esto se debe realizar a partir de Android 6.0, ya que con verdiones anteriores
-    //con solo solicitarlos en el Manifest es suficiente
+    //Array de String con permisos a solicitar en tiempo de ejecucion
     String[] permissions = new String[]{
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
@@ -61,20 +58,19 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.READ_EXTERNAL_STORAGE};
 
-    /*****conexion de bluetooth*************************************************/
+    /********************* Conexion de Bluetooth *********************/
 
     private void ini_bluetooth() {
 
         //Se crea un adaptador para poder manejar el bluethoot del celular
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        System.out.println("checkiando permisos.... (lineas 87)"); /** DEBUG !! **/
+        System.out.println("checkiando permisos...."); /** DEBUG !! **/
         if (checkPermissions()) {
-            System.out.println("permisos checkiados (lineas 87)"); /** DEBUG !! **/
+            System.out.println("permisos checkiados"); /** DEBUG !! **/
             enableComponent();
         } else {
             System.out.println("permisos fallaron!"); /** DEBUG !! **/
-            //ver despues si incluir este if en onresume
         }
 
     }
@@ -113,19 +109,18 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
     protected void enableComponent() {
         //se determina si existe bluethoot en el celular
         if (mBluetoothAdapter == null) {
-            //si el celular no soporta bluethoot
-            //showUnsupported();
+            //si el celular no soporta bluethoot - showUnsupported();
+            System.out.println("Celular no soporta Bluetooth"); /** DEBUG !! **/
         } else {
             //se determina si esta activado el bluethoot
             if (mBluetoothAdapter.isEnabled()) {
                 //se informa si esta habilitado
                 System.out.println("Bluetooth Enabled (lineas 102)"); /** DEBUG !! **/
-                //showEnabled();
                 searchDevices();
 
             } else {
-                //se informa si esta deshabilitado
-                //showDisabled();
+                //se informa si esta deshabilitado - showDisabled();
+                System.out.println("Bluetooth Disabled"); /** DEBUG !! **/
             }
         }
 
@@ -190,7 +185,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
         @SuppressLint("MissingPermission")
         public void onReceive(Context context, Intent intent) {
 
-            //Atraves del Intent obtengo el evento de Bluethoot que informo el broadcast del SO
+            //A traves del Intent obtengo el evento de Bluethoot que informo el broadcast del SO
             String action = intent.getAction();
             System.out.println("este es el action " + action); /** DEBUG !! **/
             //Si cambio de estado el Bluethoot(Activado/desactivado)
@@ -200,38 +195,23 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
 
                 //Si esta activado
                 if (state == BluetoothAdapter.STATE_ON) {
-                    // showToast("Activar");
-
-                    //showEnabled();
+                    // Esta activado - showEnabled();
+                    System.out.println("Bluetooth Activado"); /** DEBUG !! **/
                 }
             }
             //Si se inicio la busqueda de dispositivos bluethoot
             else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-                //Creo la lista donde voy a mostrar los dispositivos encontrados
-                //mDeviceList = new ArrayList<BluetoothDevice>();
-
-                //muestro el cuadro de dialogo de busqueda
-                //mProgressDlg.show();
+                System.out.println("Inició la busqueda de dispositivos Bluetooth"); /** DEBUG !! **/
             }
             //Si finalizo la busqueda de dispositivos bluethoot
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                //se cierra el cuadro de dialogo de busqueda
-                //mProgressDlg.dismiss();
-
-                //se inicia el activity DeviceListActivity pasandole como parametros, por intent,
-                //el listado de dispositovos encontrados
-                // Intent newIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-
-                //newIntent.putParcelableArrayListExtra("device.list", mDeviceList);
-
-                //startActivity(newIntent);
+                System.out.println("Finalizó la busqueda de dispositivos Bluetooth"); /** DEBUG !! **/
             }
             //si se encontro un dispositivo bluethoot
             else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //Se lo agregan sus datos a una lista de dispositivos encontrados
                 BluetoothDevice device = (BluetoothDevice) intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                System.out.println("bluetooth encontrado!"); /** DEBUG !! **/
-
+                System.out.println("Bluetooth encontrado!"); /** DEBUG !! **/
 
             }
         }
@@ -245,12 +225,10 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         System.out.println("Estado de la Activity: <<onCreate>>"); /** DEBUG !! **/
-
-
-
 
         ini_bluetooth();
 
@@ -345,6 +323,7 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
     }
 
     @Override
@@ -370,6 +349,5 @@ public class MainActivity_MagicAlarm extends AppCompatActivity {
         System.out.println("Estado de la Activity: <<onDestroy>>"); /** DEBUG !! **/
         super.onDestroy();
     }
-
 
 }

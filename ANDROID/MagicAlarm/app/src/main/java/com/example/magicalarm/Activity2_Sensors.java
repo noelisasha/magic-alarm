@@ -82,7 +82,7 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
                 case Sensor.TYPE_LIGHT :
                     txt += "--- Análisis del Sensor de Luminosidad ---\n";
                     txt += "\n";
-                    txt += "Función: Al tapar el sensor de luz del celular, se iluminará la lamparita de la imagen que esta abajo.\n";
+                    txt += "Función: Al tapar el sensor de luz del celular, se apagará la lamparita de la imagen que esta abajo.\n";
                     txt += "\n";
                     txt += "Medición del Sensor de luz:\n";
                     txt += "\n";
@@ -91,10 +91,10 @@ public class Activity2_Sensors extends AppCompatActivity implements SensorEventL
                     lightness.setText(txt);
 
                     if(event.values[0] <= 200) {
-                        System.out.println("No se detecta luz ==> PRENDER LUZ"); /** DEBUG !! **/
+                        System.out.println("No se detecta luz ==> APAGAR LAMPARA"); /** DEBUG !! **/
                         lightBulbImg.setColorFilter(Color.parseColor("#000000")); // Si no detectó luz ==> pintar borde de lampara simulando encender luz
                     } else {
-                        System.out.println("Se detectó luz ==> APAGAR LUZ"); /** DEBUG !! **/
+                        System.out.println("Se detectó luz ==> ENCENDER LAMPARA"); /** DEBUG !! **/
                         lightBulbImg.setColorFilter(Color.parseColor("#FFFFEB3B")); // Si detectó luz ==> pintar borde de lampara simulando apagar luz
                     }
 
